@@ -11,11 +11,11 @@ source:
 
 build:
   number: 0
-  script:
-    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-    # Remove vendored Windows binaries (rm.exe + libintl/libiconv DLLs).
-    # These trigger overlinking checks and should be provided by conda packages if needed.
-    - if exist %SP_DIR%\pygeostat\fortran\resource\rm rmdir /s /q %SP_DIR%\pygeostat\fortran\resource\rm  # [win]
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  # pygeostat bundles Windows binaries under pygeostat/fortran/resource/rm;
+  # libintl3.dll links against libiconv2.dll from that same bundled folder.
+  missing_dso_whitelist:
+    - "**/libiconv2.dll"  # [win]
   skip: True  # [py<310]
 
 requirements:
