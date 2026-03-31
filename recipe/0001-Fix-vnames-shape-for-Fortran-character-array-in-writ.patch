@@ -1,0 +1,37 @@
+From d0cc8e373220206a46ead9ed86645e18bddfbb91 Mon Sep 17 00:00:00 2001
+From: Mikolaj Gralczyk <mgralczyk@anaconda.com>
+Date: Tue, 31 Mar 2026 12:15:59 +0200
+Subject: [PATCH] Fix vnames shape for Fortran character array in write_gsb
+
+The cvariables array passed as vnames to pywritegsbdata must be a 2D
+numpy char array of shape (nvar, 64), matching the fixed-width character
+array convention expected by the Fortran subroutine.
+
+The original list-of-lists was rejected by f2py as wrong rank on Windows.
+The intermediate flat list fix was rejected as wrong dimension (got 704,
+expected nvar as 0th dimension).
+---
+ src/pygeostat/data/iotools.py | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/pygeostat/data/iotools.py b/src/pygeostat/data/iotools.py
+index 39040f3..3fcdcbf 100644
+--- a/src/pygeostat/data/iotools.py
++++ b/src/pygeostat/data/iotools.py
+@@ -559,9 +559,10 @@ def write_gsb(data, flname, tvar=None, nreals=1, variables=None, griddef=None, f
+         raise ValueError("Invalid trimming variable {}".format(tvar))
+ 
+     # Character conversion of strings
+-    cvariables = []
+-    for varname in [var.ljust(64) for var in variables]:
+-        cvariables.append([v for v in varname])
++    cvariables = np.array(
++        [[c for c in var.ljust(64)] for var in variables],
++        dtype='c'
++    )
+ 
+     tmin = Parameters.get('data.tmin', None)
+     if tmin is None:
+-- 
+2.50.1 (Apple Git-155)
+
