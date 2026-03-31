@@ -8,6 +8,8 @@ package:
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: 0ef3f98412556498029e50a974088e915cd401a724772b68f369218c984461ff
+  patches:
+    - 0001-Create-1D-list-instead-of-2D.patch  # [win]
 
 build:
   number: 0
@@ -28,7 +30,7 @@ requirements:
     - h5py >=3.13.0
     - matplotlib >=3.10.0
     - numba >=0.61.0
-    - numpy >=1.24,<2.0
+    - numpy >=2.1.3
     # pygeostat 1.2.0 still uses Series integer indexing (s[0]) in HDF5 I/O;
     # pandas 3 treats integer keys as labels and breaks this path.
     # This issue was found in 'test_write_read_h5' test without '<3' constraint.
