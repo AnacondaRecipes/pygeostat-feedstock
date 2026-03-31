@@ -1,0 +1,52 @@
+From 9387ff42a7f0a8dfbe6ec7f84cc67911a9366c59 Mon Sep 17 00:00:00 2001
+From: Mikolaj Gralczyk <mgralczyk@anaconda.com>
+Date: Tue, 31 Mar 2026 13:30:20 +0200
+Subject: [PATCH] Fix GSB variable name encoding/decoding for NumPy 2.x f2py
+ ABI
+
+In NumPy 2.x, f2py maps Fortran character(len=64) arrays differently:
+- write_gsb: vnames must be passed as a 1D numpy array of dtype S64
+  (fixed-width 64-byte strings) instead of a list-of-lists of chars
+- read_gsb: vnames are returned as 1D bytes objects (one per variable)
+  instead of 2D arrays of single chars requiring per-byte decoding
+
+Both issues are silent on Linux/macOS due to looser f2py validation
+in older NumPy 1.x builds shipped there.
+---
+ src/pygeostat/data/iotools.py | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/src/pygeostat/data/iotools.py b/src/pygeostat/data/iotools.py
+index 39040f3..44b4a5f 100644
+--- a/src/pygeostat/data/iotools.py
++++ b/src/pygeostat/data/iotools.py
+@@ -325,7 +325,11 @@ def read_gsb(flname, ireal=-1, tmin=None, null=None):
+         raise AssertionError("Error reading GSB data!, Error #{}".format(errorvalue))
+ 
+     # Clean up column names and trimmed data
+-    vnames = [''.join([v.decode("utf-8") for v in vname]).strip() for vname in vnames]
++    vnames = [
++        (vname.decode("utf-8") if isinstance(vname, bytes) else
++        ''.join([v.decode("utf-8") for v in vname])).strip()
++        for vname in vnames
++    ]
+ 
+     # Convert to pandas dataframe
+     data = pd.DataFrame(data=reals.transpose(), columns=vnames)
+@@ -559,9 +563,10 @@ def write_gsb(data, flname, tvar=None, nreals=1, variables=None, griddef=None, f
+         raise ValueError("Invalid trimming variable {}".format(tvar))
+ 
+     # Character conversion of strings
+-    cvariables = []
+-    for varname in [var.ljust(64) for var in variables]:
+-        cvariables.append([v for v in varname])
++    cvariables = np.array(
++        [var.ljust(64).encode('ascii') for var in variables],
++        dtype='S64'
++    )
+ 
+     tmin = Parameters.get('data.tmin', None)
+     if tmin is None:
+-- 
+2.50.1 (Apple Git-155)
+
