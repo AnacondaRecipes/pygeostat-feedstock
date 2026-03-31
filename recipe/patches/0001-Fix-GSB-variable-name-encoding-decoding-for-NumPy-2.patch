@@ -10,8 +10,7 @@ In NumPy 2.x, f2py maps Fortran character(len=64) arrays differently:
 - read_gsb: vnames are returned as 1D bytes objects (one per variable)
   instead of 2D arrays of single chars requiring per-byte decoding
 
-Both issues are silent on Linux/macOS due to looser f2py validation
-in older NumPy 1.x builds shipped there.
+'test_write_read_gsb' reproduces this issue. On Unix, it's skipped by default.
 ---
  src/pygeostat/data/iotools.py | 13 +++++++++----
  1 file changed, 9 insertions(+), 4 deletions(-)
