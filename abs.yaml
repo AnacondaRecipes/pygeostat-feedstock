@@ -1,5 +1,0 @@
-build_env_vars:
-  ANACONDA_ROCKET_ENABLE_PY314 : yes
-
-channels:
-  - https://staging.continuum.io/pbp/fs/mpl-probscale-feedstock/pr1/c68b9ac
