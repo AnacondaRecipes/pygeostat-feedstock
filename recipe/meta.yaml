@@ -9,7 +9,7 @@ source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: 0ef3f98412556498029e50a974088e915cd401a724772b68f369218c984461ff
   patches:
-    - 0001-Fix-vnames-shape-for-Fortran-character-array-in-writ.patch  # [win]
+    - 0001-Fix-vnames-dtype-for-Fortran-character-array-in-writ.patch  # [win]
 
 build:
   number: 0

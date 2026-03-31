@@ -1,0 +1,79 @@
+From fd2ade9a9b420e96709b9691813ad986ceb62c35 Mon Sep 17 00:00:00 2001
+From: Mikolaj Gralczyk <mgralczyk@anaconda.com>
+Date: Tue, 31 Mar 2026 12:37:19 +0200
+Subject: [PATCH] Fix vnames dtype for Fortran character array in write_gsb
+
+pywritegsbdata declares vnames as character(len=64), dimension(nvar).
+f2py maps this as a 1D array of fixed-width 64-byte strings (dtype S64),
+not a 2D char array. The original list-of-lists and subsequent numpy
+dtype='c' fix both produced 2D arrays rejected as wrong rank on Windows.
+---
+ ...-for-Fortran-character-array-in-writ.patch | 37 +++++++++++++++++++
+ src/pygeostat/data/iotools.py                 |  7 ++--
+ 2 files changed, 41 insertions(+), 3 deletions(-)
+ create mode 100644 0001-Fix-vnames-shape-for-Fortran-character-array-in-writ.patch
+
+diff --git a/0001-Fix-vnames-shape-for-Fortran-character-array-in-writ.patch b/0001-Fix-vnames-shape-for-Fortran-character-array-in-writ.patch
+new file mode 100644
+index 0000000..29cf687
+--- /dev/null
++++ b/0001-Fix-vnames-shape-for-Fortran-character-array-in-writ.patch
+@@ -0,0 +1,37 @@
++From d0cc8e373220206a46ead9ed86645e18bddfbb91 Mon Sep 17 00:00:00 2001
++From: Mikolaj Gralczyk <mgralczyk@anaconda.com>
++Date: Tue, 31 Mar 2026 12:15:59 +0200
++Subject: [PATCH] Fix vnames shape for Fortran character array in write_gsb
++
++The cvariables array passed as vnames to pywritegsbdata must be a 2D
++numpy char array of shape (nvar, 64), matching the fixed-width character
++array convention expected by the Fortran subroutine.
++
++The original list-of-lists was rejected by f2py as wrong rank on Windows.
++The intermediate flat list fix was rejected as wrong dimension (got 704,
++expected nvar as 0th dimension).
++---
++ src/pygeostat/data/iotools.py | 7 ++++---
++ 1 file changed, 4 insertions(+), 3 deletions(-)
++
++diff --git a/src/pygeostat/data/iotools.py b/src/pygeostat/data/iotools.py
++index 39040f3..3fcdcbf 100644
++--- a/src/pygeostat/data/iotools.py
+++++ b/src/pygeostat/data/iotools.py
++@@ -559,9 +559,10 @@ def write_gsb(data, flname, tvar=None, nreals=1, variables=None, griddef=None, f
++         raise ValueError("Invalid trimming variable {}".format(tvar))
++ 
++     # Character conversion of strings
++-    cvariables = []
++-    for varname in [var.ljust(64) for var in variables]:
++-        cvariables.append([v for v in varname])
+++    cvariables = np.array(
+++        [[c for c in var.ljust(64)] for var in variables],
+++        dtype='c'
+++    )
++ 
++     tmin = Parameters.get('data.tmin', None)
++     if tmin is None:
++-- 
++2.50.1 (Apple Git-155)
++
+diff --git a/src/pygeostat/data/iotools.py b/src/pygeostat/data/iotools.py
+index 39040f3..2069bea 100644
+--- a/src/pygeostat/data/iotools.py
++++ b/src/pygeostat/data/iotools.py
+@@ -559,9 +559,10 @@ def write_gsb(data, flname, tvar=None, nreals=1, variables=None, griddef=None, f
+         raise ValueError("Invalid trimming variable {}".format(tvar))
+ 
+     # Character conversion of strings
+-    cvariables = []
+-    for varname in [var.ljust(64) for var in variables]:
+-        cvariables.append([v for v in varname])
++    cvariables = np.array(
++        [var.ljust(64).encode('ascii') for var in variables],
++        dtype='S64'
++    )
+ 
+     tmin = Parameters.get('data.tmin', None)
+     if tmin is None:
+-- 
+2.50.1 (Apple Git-155)
+
