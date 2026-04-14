@@ -1,13 +1,13 @@
-About <pkg_name>-feedstock
+About pygeostat-feedstock
 =======================
 
 Feedstock license: [BSD-3-Clause](LICENSE)
 
-Home: <home_url>
+Home: https://www.ccgalberta.com/pygeostat/welcome.html
 
-Package license: <pkg_license>
+Package license: MIT
 
-Summary: <pkg_summary>
+Summary: Python interface for geostatistics
 
 
 Current release info
@@ -15,19 +15,19 @@ Current release info
 
 | Name | Downloads | Version | Platforms |
 | --- | --- | --- | --- |
-| [![Conda Recipe](https://img.shields.io/badge/recipe-<pkg_name>-green.svg)](https://anaconda.org/anaconda/<pkg_name>) | [![Conda Downloads](https://img.shields.io/conda/dn/anaconda/<pkg_name>.svg)](https://anaconda.org/anaconda/<pkg_name>) | [![Conda Version](https://img.shields.io/conda/vn/anaconda/<pkg_name>.svg)](https://anaconda.org/anaconda/<pkg_name>) | [![Conda Platforms](https://img.shields.io/conda/pn/anaconda/<pkg_name>.svg)](https://anaconda.org/anaconda/<pkg_name>) |
+| [![Conda Recipe](https://img.shields.io/badge/recipe-pygeostat-green.svg)](https://anaconda.org/anaconda/pygeostat) | [![Conda Downloads](https://img.shields.io/conda/dn/anaconda/pygeostat.svg)](https://anaconda.org/anaconda/pygeostat) | [![Conda Version](https://img.shields.io/conda/vn/anaconda/pygeostat.svg)](https://anaconda.org/anaconda/pygeostat) | [![Conda Platforms](https://img.shields.io/conda/pn/anaconda/pygeostat.svg)](https://anaconda.org/anaconda/pygeostat) |
 
-Installing <pkg_name>
+Installing pygeostat
 ==================
 
-Installing `<pkg_name>` from the main channel can be achieved by:
+Installing `pygeostat` from the main channel can be achieved by:
 
 ```
-conda install <pkg_name>
+conda install pygeostat
 ```
 
-It is possible to list all of the versions of `<pkg_name>` available on your platform with `conda`:
+It is possible to list all of the versions of `pygeostat` available on your platform with `conda`:
 
 ```
-conda search <pkg_name>
+conda search pygeostat
 ```
